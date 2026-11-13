@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#1656C9"/>
+  <title>MACS Soldiers</title>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <!-- THE OPENING: a cinematic reveal of the society's seal, which then
+       travels to its place on the screen behind (splash.js). It is in the
+       page itself so it is the first thing painted. Three levels: the scene
+       behind the seal, the seal, and what passes in front of it. If the
+       script never runs, it all fades away by itself (see styles.css). -->
+  <div id="splash" aria-hidden="true">
+    <div class="sp-env" id="sp-env">
+      <div class="sp-bg"></div>
+      <div class="sp-neb"><i></i><i></i><i></i></div>
+      <div class="sp-hero"></div>
+      <div class="sp-lines" id="sp-lines"></div>
+      <canvas class="sp-fx" id="sp-fx-bg"></canvas>
+    </div>
+    <div class="sp-stage" id="sp-stage">
+      <div class="sp-seal" id="sp-seal">
+        <div class="sp-aura"></div>
+        <div class="sp-bloom"></div>
+        <div class="sp-paper"></div>
+        <div class="sp-rays"></div>
+        <div class="sp-gold"></div>
+        <div class="sp-layers" id="sp-layers"></div>
+        <img class="sp-final" id="sp-final" src="icons/seal-640.jpg" alt=""/>
+      </div>
+    </div>
+    <div class="sp-over" id="sp-over">
+      <canvas class="sp-fx" id="sp-fx-fg"></canvas>
+      <div class="sp-sweep"></div>
+      <div class="sp-vig"></div>
+    </div>
+  </div>
+  <script src="splash.js"></script>
+
+  <!-- LOGIN -->
+  <div id="netbar" aria-hidden="true"></div>
+  <!-- Opens on the emblem alone ("booting"); app.js shows the sign-in card
+       once it knows nobody is signed in. If the script never runs, the card
+       still appears by itself after a few seconds (see styles.css). -->
+  <section id="screen-login" class="booting">
+    <span id="emblem-slot"></span>
+    <div class="brand-name">MACS Soldiers</div>
+    <div class="brand-sub" id="l-society">Palnadu Co-operative Society Ltd.</div>
+    <div class="glass">
+      <div class="fieldwrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <input id="username" type="text" autocomplete="username" placeholder="Username"/>
+      </div>
+      <div class="fieldwrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password"/>
+      </div>
+      <button class="btn-gold" id="loginBtn">Sign in</button>
+      <div class="login-msg" id="loginMsg"></div>
+    </div>
+    <div class="lang-toggle">
+      <button data-lang="en" class="on">English</button>
+      <button data-lang="te">తెలుగు</button>
+    </div>
+    <div class="bootdots" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <!-- APP SHELL (built by JS) -->
+  <div id="app-root" class="hidden"></div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://js.sentry-cdn.com/d4eea37796d1d99af07468548bb99b92.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>

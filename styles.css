@@ -1,0 +1,991 @@
+:root{
+  --blue:#1656C9; --blue-deep:#0B3B8F; --blue-2:#2E74E8; --blue-wash:#E9F1FE;
+  --pink:#E01586; --pink-deep:#A50E60; --pink-wash:#FDE9F3;
+  --gold:#F6B60C; --gold-deep:#C4880A; --gold-wash:#FFF4D6;
+  --ink:#141F35; --muted:#6A7A97; --card:#fff; --screen:#EEF3FB; --hair:#E4E9F2;
+  --green:#12A150; --green-wash:#E6F7ED; --red:#D64545;
+  --shadow:0 1px 2px rgba(11,26,59,.06),0 12px 24px -16px rgba(11,26,59,.4);
+  --shadow-lg:0 10px 22px -10px rgba(11,26,59,.5);
+  --ease:cubic-bezier(.2,.8,.2,1);          /* quick start, soft landing */
+  --spring:cubic-bezier(.34,1.56,.64,1);    /* lands with a small overshoot */
+  --rail:86px;                              /* side navigation on a desk screen */
+  /* Text that sits on a pale tint. Kept apart from the deep colours above,
+     which also end the blue gradients: dark mode lightens these and leaves
+     the gradients alone. */
+  --blue-ink:#0B3B8F; --pink-ink:#A50E60; --gold-ink:#C4880A; --red-ink:#D64545;
+  /* quiet fills and hairlines that used to be written out as literals */
+  --soft:#EEF1F5; --softer:#FBFCFE; --dim:#F2F0F0; --dim-ink:#8A857F; --dim-line:#E2DED9; --ro:#F1F4FA;
+  --red-wash:#FDEAEA; --gold-line:#F3E2AD; --pink-line:#F6CEE0; --green-line:#BFE8CF; --blue-line:#CFE0FB;
+  --skel:#E2E9F5; --skel-shine:rgba(255,255,255,.8); --toast:#141F35;
+  --mav1:#EDF3FF; --mav2:#D7E5FE; --ghost-hover:#E3E8F1; --photo-hover:#DCE8FD;
+}
+/* ---------- dark mode ----------
+   Switched with the moon button in the top bar (remembered on the device).
+   Only the names change; every rule below reads them. The top bar, the
+   sign-in screen and the coloured tiles keep their own colours, and the
+   passbook stays paper-white (see .pbook). */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --ink:#E7ECF7; --muted:#93A1BC; --card:#151D2F; --screen:#0B1220; --hair:#263249;
+  --blue-wash:#16264A; --pink-wash:#3A1530; --gold-wash:#3A2E0E; --green-wash:#0F2F20;
+  --green:#4ADE80;
+  --blue-ink:#9DBEFF; --pink-ink:#FF8CC8; --gold-ink:#F6C453; --red-ink:#FF8A8A;
+  --soft:#1E2840; --softer:#111A2B; --dim:#232A38; --dim-ink:#9AA3B5; --dim-line:#343D50; --ro:#111A2B;
+  --red-wash:#3A1518; --gold-line:#5A4712; --pink-line:#5A2145; --green-line:#1F5A3A; --blue-line:#24407A;
+  --skel:#1C2740; --skel-shine:rgba(255,255,255,.07); --toast:#2A3550;
+  --mav1:#1B2B52; --mav2:#16264A; --ghost-hover:#26324D; --photo-hover:#1C3160;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 24px -16px rgba(0,0,0,.75);
+  --shadow-lg:0 10px 22px -10px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--screen);color:var(--ink);overscroll-behavior:none}
+img{max-width:100%}
+.hidden{display:none!important}
+
+/* ---------- LOGIN ---------- */
+#screen-login{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  background:radial-gradient(120% 80% at 50% -5%,#2E74E8 0%,var(--blue) 45%,var(--blue-deep) 100%);color:#fff}
+.emblem{width:104px;height:104px;filter:drop-shadow(0 12px 22px rgba(0,0,0,.35))}
+.brand-name{font-size:24px;font-weight:800;margin-top:16px;letter-spacing:.01em}
+.brand-sub{font-size:12.5px;opacity:.85;margin-top:3px;text-align:center}
+/* No backdrop blur: the colours behind it drift, and blurring a moving
+   background every frame is the one thing a cheap phone cannot do smoothly.
+   Over soft gradients a plain translucent fill looks the same. */
+.glass{width:100%;max-width:360px;margin-top:22px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);
+  border-radius:22px;padding:18px;box-shadow:0 24px 48px -22px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+.fieldwrap{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.94);border-radius:12px;
+  padding:2px 12px;margin-top:12px}
+.fieldwrap svg{width:18px;height:18px;flex:none;color:var(--blue)}
+.fieldwrap input{flex:1;border:0;background:transparent;outline:none;padding:12px 0;font-size:15px;color:#2a3450;font-weight:500}
+.btn-gold{margin-top:16px;width:100%;border:0;background:linear-gradient(135deg,#FFCE45,var(--gold-deep));color:#3a2a00;
+  font-weight:800;font-size:15px;padding:14px;border-radius:12px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(196,136,10,.7)}
+.btn-gold:active{transform:scale(.98)}
+.login-msg{min-height:18px;font-size:13px;margin-top:12px;text-align:center;color:#ffd7d0;font-weight:600}
+.lang-toggle{display:flex;gap:8px;margin-top:18px}
+.lang-toggle button{border:0;font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.18);color:#fff}
+.lang-toggle button.on{background:var(--gold);color:#3a2a00}
+
+/* ---------- APP SHELL ---------- */
+#app-root{min-height:100dvh;display:flex;flex-direction:column;padding-bottom:74px}
+.topbar{position:sticky;top:0;z-index:20;color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 14px;
+  background:linear-gradient(135deg,var(--blue-2),var(--blue) 55%,var(--blue-deep));
+  display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 18px -12px rgba(11,26,59,.8)}
+.topbar .tb-left{display:flex;align-items:center;gap:10px;min-width:0}
+.tb-emblem{width:34px;height:34px;flex:none}
+.tb-title{font-size:16px;font-weight:800;line-height:1.1}
+.tb-sub{font-size:11px;opacity:.85}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-btn{width:34px;height:34px;border:0;border-radius:10px;background:rgba(255,255,255,.16);color:#fff;
+  display:grid;place-items:center;cursor:pointer}
+.tb-btn svg{width:18px;height:18px}
+.langpill{border:0;background:rgba(255,255,255,.16);color:#fff;font-size:11px;font-weight:800;padding:8px 10px;border-radius:10px;cursor:pointer}
+
+.content{flex:1;padding:14px 16px}
+.screen{display:none}.screen.active{display:block}
+
+/* tiles + cards */
+.tile{border-radius:18px;padding:15px 16px;color:#fff;box-shadow:var(--shadow-lg)}
+.tile.blue{background:linear-gradient(135deg,var(--blue-2),var(--blue-deep))}
+.tile.pink{background:linear-gradient(135deg,#F53DA0,var(--pink-deep))}
+.tile.gold{background:linear-gradient(135deg,#FFCE45,var(--gold-deep));color:#3a2a00}
+.tile .tlabel{font-size:12px;font-weight:600;opacity:.92}
+.tile .tval{font-size:26px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.tile .tnote{font-size:11.5px;opacity:.9;margin-top:2px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+.stat{background:var(--card);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}
+.stat .slabel{font-size:11.5px;color:var(--muted);font-weight:600}
+.stat .sval{font-size:20px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.sval.blue{color:var(--blue-ink)}.sval.pink{color:var(--pink-ink)}.sval.gold{color:var(--gold-ink)}
+
+.sectlabel{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 2px 9px}
+.card{background:var(--card);border-radius:16px;padding:13px;margin-top:10px;box-shadow:var(--shadow)}
+.mrow{display:flex;align-items:center;gap:11px}
+.mav{width:40px;height:40px;border-radius:12px;background:var(--blue-wash);color:var(--blue-ink);
+  display:grid;place-items:center;font-weight:800;font-size:14px;flex:none}
+.mname{font-size:14px;font-weight:700;line-height:1.15}
+.mmeta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.rowright{margin-left:auto;text-align:right}
+.amoney{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+
+.searchbar{width:100%;padding:13px 14px;border:1px solid var(--hair);border-radius:14px;font-size:15px;
+  background:var(--card);box-shadow:var(--shadow);margin-bottom:6px}
+.searchbar:focus{outline:2px solid var(--blue-wash);border-color:var(--blue)}
+.listmeta{font-size:12px;color:var(--muted);margin:4px 2px 8px}
+
+.empty{text-align:center;color:var(--muted);padding:44px 20px;font-size:14px;line-height:1.6}
+.empty svg{width:40px;height:40px;color:var(--hair);margin-bottom:8px}
+
+/* bottom nav */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;background:var(--card);
+  border-top:1px solid var(--hair);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.bottomnav button{flex:1;border:0;background:none;cursor:pointer;color:var(--muted);font-size:10.5px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottomnav button svg{width:22px;height:22px}
+.bottomnav button.on{color:var(--blue)}
+
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--toast);color:#fff;
+  padding:12px 20px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:88%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+
+/* ---------- collection slots ---------- */
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.slot{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:9px 11px;border-radius:12px;
+  border:1px solid var(--hair);cursor:pointer;background:var(--card)}
+.slot .lab{color:var(--muted);font-weight:600}
+.slot svg{width:15px;height:15px}
+.slot.rd{background:var(--gold-wash);border-color:var(--gold-line);color:var(--gold-ink)}
+.slot.loan{background:var(--pink-wash);border-color:var(--pink-line);color:var(--pink-ink)}
+.slot.paid{background:var(--green-wash);border-color:var(--green-line);color:var(--green);cursor:default}
+.slot.np{background:var(--dim);border-color:var(--dim-line);color:var(--dim-ink);cursor:default}
+
+/* ---------- sheet ---------- */
+.sheet-back{position:fixed;inset:0;z-index:50;background:rgba(16,25,46,.5);display:none;align-items:flex-end}
+.sheet-back.open{display:flex}
+.sheet{width:100%;background:var(--card);border-radius:22px 22px 0 0;
+  padding:8px 20px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.22);animation:up .22s ease}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.sheet-grab{width:40px;height:4px;border-radius:3px;background:var(--hair);margin:6px auto 14px}
+.sh-mem{display:flex;align-items:center;gap:11px}
+.sh-name{font-size:17px;font-weight:800}
+.sh-prod{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;margin-top:10px}
+.sh-prod.rd{background:var(--gold-wash);color:var(--gold-ink)}.sh-prod.loan{background:var(--pink-wash);color:var(--pink-ink)}
+.amt-label{font-size:12px;color:var(--muted);margin-top:12px}
+.amt-input{width:100%;font-size:32px;font-weight:800;text-align:center;border:2px solid var(--hair);border-radius:14px;
+  padding:12px;margin:6px 0 12px;font-variant-numeric:tabular-nums}
+.amt-input:focus{outline:none;border-color:var(--blue)}
+.quick{display:flex;gap:8px;margin-bottom:12px}
+.quick button{flex:1;padding:10px 0;border:1px solid var(--hair);border-radius:10px;background:var(--card);font-weight:700;cursor:pointer}
+.quick button:active{background:var(--blue-wash);border-color:var(--blue)}
+.photo-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px;border:2px dashed var(--blue);
+  border-radius:14px;background:var(--blue-wash);color:var(--blue-ink);font-weight:800;font-size:14px;cursor:pointer;
+  font-family:inherit}
+.photo-btn:disabled{opacity:.6;cursor:default}
+.photo-btn svg{width:20px;height:20px}
+.photo-prev{position:relative;margin-top:2px}
+.photo-prev img{width:100%;max-height:210px;object-fit:cover;border-radius:14px;display:block}
+.photo-prev button{position:absolute;top:8px;right:8px;border:0;background:rgba(0,0,0,.6);color:#fff;width:30px;height:30px;
+  border-radius:50%;font-size:15px;cursor:pointer;line-height:1}
+.sh-actions{display:flex;gap:10px;margin-top:16px}
+.btn-primary{flex:2;background:linear-gradient(135deg,var(--blue-2),var(--blue-deep));color:#fff;border:0;border-radius:12px;
+  padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-primary:disabled{opacity:.5}
+.btn-ghost{flex:1;background:var(--soft);color:var(--ink);border:0;border-radius:12px;padding:15px;font-weight:700;cursor:pointer}
+.np-link{text-align:center;margin-top:13px}
+.np-link button{background:none;border:0;color:var(--pink-ink);font-weight:700;font-size:13px;cursor:pointer}
+.reasons{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.reasons button{border:1px solid var(--hair);background:var(--card);border-radius:999px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.reasons button:active{background:var(--pink-wash);border-color:var(--pink)}
+
+/* ---------- detail overlay + drill-down ---------- */
+.detail{position:fixed;inset:0;z-index:45;background:var(--screen);display:none;flex-direction:column;overflow-y:auto}
+.detail.open{display:flex}
+.detail .content{padding:14px 16px 34px}
+.dhead{position:sticky;top:0;z-index:2;color:#fff;display:flex;align-items:center;gap:11px;
+  padding:calc(12px + env(safe-area-inset-top)) 14px 14px;background:linear-gradient(135deg,var(--blue-2),var(--blue) 55%,var(--blue-deep))}
+.dback{width:36px;height:36px;border:0;border-radius:10px;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none}
+.dback svg{width:20px;height:20px}
+.dtitle{font-size:16px;font-weight:800;line-height:1.1}
+.dsub{font-size:11.5px;opacity:.85;margin-top:2px}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:9px 0;border-bottom:1px solid var(--hair)}
+.kv .k{color:var(--muted)} .kv .v{font-weight:700;text-align:right}
+.pill-s{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px}
+.pill-s.rd{background:var(--gold-wash);color:var(--gold-ink)}.pill-s.loan{background:var(--pink-wash);color:var(--pink-ink)}
+.pill-s.fd{background:var(--blue-wash);color:var(--blue-ink)}.pill-s.sb{background:var(--soft);color:var(--muted)}
+.thumb{width:100%;height:150px;border-radius:12px;object-fit:cover;cursor:pointer;border:1px solid var(--hair);display:block;margin-top:10px}
+.badge-np{font-size:11px;font-weight:800;color:var(--dim-ink);background:var(--dim);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.lightbox{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;padding:18px}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:100%;border-radius:12px}
+
+/* ---------- branches ---------- */
+.branchbar{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch}
+.branchbar::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--hair);background:var(--card);color:var(--muted);
+  font-size:12.5px;font-weight:700;padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* reserved (allocated but unfilled) account numbers */
+.card.held{border:1px dashed var(--hair);box-shadow:none;background:var(--softer)}
+.mav.held{background:var(--soft);color:var(--muted)}
+
+/* ---------- account entry form ---------- */
+.fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:35;
+  width:56px;height:56px;border:0;border-radius:50%;cursor:pointer;
+  background:linear-gradient(135deg,var(--blue-2),var(--blue-deep));color:#fff;
+  font-size:30px;line-height:1;box-shadow:0 10px 22px -8px rgba(11,26,59,.7)}
+.fab:active{transform:scale(.95)}
+.entry-hint{font-size:12.5px;color:var(--muted);background:var(--blue-wash);
+  border-radius:10px;padding:10px 12px;margin-bottom:14px;line-height:1.5}
+.flabel{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 2px 5px}
+.fhint{font-weight:600;color:var(--pink-ink)}
+.finput{width:100%;padding:12px 13px;border:1px solid var(--hair);border-radius:11px;
+  font-size:16px;background:var(--card);color:var(--ink)}
+.finput:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-wash)}
+.fnote{font-size:11.5px;color:var(--muted);margin:4px 2px 0;min-height:14px}
+.fnote.warn{color:var(--gold-ink);font-weight:600}
+.fmsg{font-size:13px;font-weight:600;margin-top:12px;min-height:18px}
+.fmsg.err{color:var(--red-ink)}
+.memberphoto{width:100%;max-height:230px;object-fit:cover;border-radius:14px;
+  border:1px solid var(--hair);display:block;margin-bottom:12px;cursor:pointer}
+
+/* ---------- checking transcribed rows ---------- */
+.checkbtn{display:flex;align-items:center;gap:10px;width:100%;margin-bottom:10px;cursor:pointer;
+  border:1px solid var(--gold-line);background:var(--gold-wash);color:var(--gold-ink);
+  border-radius:12px;padding:11px 13px;font-size:13.5px;font-weight:700;text-align:left}
+.checkbtn-n{background:var(--gold-deep);color:#fff;border-radius:999px;
+  min-width:26px;padding:2px 7px;text-align:center;font-size:12.5px}
+.checkbtn-go{margin-left:auto;font-size:19px;line-height:1}
+.vcard{border-left:3px solid var(--gold);cursor:pointer}
+.vcard.done{border-left-color:var(--green);opacity:.72}
+.tick{flex:none;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:19px;line-height:1;
+  border:1px solid var(--hair);background:var(--card);color:var(--muted)}
+.tick.on{background:var(--green-wash);border-color:var(--green-line);color:var(--green)}
+.tick:disabled{opacity:.5}
+.vnote{margin-top:10px;background:var(--gold-wash);border-radius:10px;padding:9px 11px;
+  font-size:12.5px;line-height:1.5;color:var(--gold-ink)}
+.vnote-k{display:block;font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;opacity:.75;margin-bottom:3px}
+.vgrid{margin-top:10px;border-top:1px solid var(--hair);padding-top:8px}
+.vf{display:flex;gap:12px;font-size:12.5px;padding:3px 0}
+.vk{color:var(--muted);flex:0 0 42%}
+.vv{font-weight:600;flex:1;word-break:break-word}
+
+/* ---------- entry desk: my entries, wrong-entry reports ---------- */
+.erow[data-eid]{cursor:pointer}
+.erow[data-eid]:active{background:var(--blue-wash)}
+.erow[data-eid]:focus-visible{outline:2px solid var(--blue)}
+.eright{display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-left:8px;flex:none}
+.ebadge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.ebadge.wait{background:var(--gold-wash);color:var(--gold-ink)}
+.ebadge.cancelled{background:var(--red-wash);color:var(--red-ink)}
+.ebadge.kept{background:var(--green-wash);color:var(--green)}
+.erow.cancelled{box-shadow:none;border:1px dashed var(--hair);background:var(--softer)}
+.erow.cancelled .mname,.erow.cancelled .amoney{color:var(--muted)}
+.erow.cancelled .amoney{text-decoration:line-through}
+.erow.cancelled .mav{background:var(--soft);color:var(--muted)}
+.enote{margin-top:9px;padding-top:8px;border-top:1px dashed var(--hair);font-size:12.5px;line-height:1.45;color:var(--muted)}
+.rnote{display:block;margin-top:12px;resize:vertical;font-family:inherit;min-height:84px}
+.btn-danger{flex:1;background:var(--red-wash);color:var(--red-ink);border:0;border-radius:12px;padding:15px;font-weight:800;cursor:pointer}
+.btn-danger:disabled,.btn-ghost:disabled{opacity:.5}
+.rowact{display:flex;justify-content:flex-end;margin-top:8px}
+.linkbtn{border:0;background:none;font-size:12.5px;font-weight:700;color:var(--blue-ink);cursor:pointer;padding:4px 2px}
+.linkbtn.danger{color:var(--red-ink)}
+.linkbtn:disabled{opacity:.5}
+.chip:disabled{opacity:.4;cursor:default}
+.nextbtn{margin-top:14px;background:var(--blue-wash);border-color:var(--blue-wash);text-align:center}
+
+/* ---------- requests: entry staff ask, the operator approves ---------- */
+.ebadge.gone{background:var(--soft);color:var(--muted)}
+.checkbtn.req{border-color:var(--blue-line);background:var(--blue-wash);color:var(--blue-ink)}
+.checkbtn.req .checkbtn-n{background:var(--blue-deep)}
+.rowact{gap:18px}
+.card.reqchild{margin-left:18px}
+.chipwrap{flex-wrap:wrap;overflow:visible}
+
+/* A staff desk is usually a wide screen: keep the working column readable
+   instead of stretching cards across the whole monitor. */
+@media (min-width:900px){
+  #app-root>.content,.detail:not(#passbook)>.content{width:100%;max-width:820px;margin-left:auto;margin-right:auto}
+  .sheet{max-width:560px;margin:0 auto;border-radius:22px}
+  .sheet-back{align-items:center}
+}
+
+/* ---------- member photographs ---------- */
+.photo-ph{border-radius:50%;background:var(--blue-wash);color:var(--blue-ink);
+  display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+  border:1px solid var(--hair)}
+.memberphoto-ph{display:flex;justify-content:center;margin-bottom:12px}
+.actionbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-bottom:10px;cursor:pointer;
+  border:1px solid var(--hair);background:var(--card);color:var(--blue-ink);
+  border-radius:12px;padding:11px 13px;font-size:13.5px;font-weight:700}
+.actionbtn svg{width:17px;height:17px;flex:none}
+.actionbtn:active{background:var(--blue-wash)}
+.btnrow{display:flex;gap:10px}
+.btnrow .actionbtn{flex:1}
+.bulklist{font-size:12.5px;line-height:1.8;word-break:break-word}
+.bulklist.warn{color:var(--gold-ink)}
+.bulklist.muted{color:var(--muted)}
+
+/* ---------- passbook ----------
+   Laid out like the paper book: society head, identity, holdings, ruled
+   ledger. Sized to print on one A4 sheet. */
+.pbook{--ink:#141F35;--muted:#6A7A97;--hair:#E4E9F2;--card:#fff;--blue-wash:#E9F1FE;--gold-wash:#FFF4D6;--green-wash:#E6F7ED;--pink-wash:#FDE9F3;
+  --green:#12A150;--blue-ink:#0B3B8F;--gold-ink:#C4880A;--pink-ink:#A50E60;--red-ink:#D64545;--soft:#EEF1F5;
+  background:#fff;border:1px solid var(--hair);border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 4px rgba(11,26,59,.07),0 22px 44px -26px rgba(11,26,59,.55);
+  max-width:780px;margin:0 auto;color:var(--ink)}
+.pbook>*:not(.pb-head):not(.pb-member){margin-left:24px;margin-right:24px}
+.pb-head{display:flex;align-items:center;gap:15px;padding:20px 24px;
+  background:linear-gradient(135deg,var(--blue-2),var(--blue) 55%,var(--blue-deep));color:#fff;
+  border-bottom:4px solid var(--gold)}
+.pb-logo{width:64px;height:64px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid rgba(255,255,255,.55);background:#fff}
+.pb-society{font-size:20px;font-weight:800;line-height:1.15;letter-spacing:.01em}
+.pb-society-sub{font-size:11px;opacity:.85;margin-top:3px}
+.pb-regd{font-size:10.5px;font-weight:700;margin-top:6px;display:inline-block;
+  background:rgba(255,255,255,.18);padding:3px 9px;border-radius:999px;letter-spacing:.02em}
+
+.pb-member{display:flex;gap:18px;align-items:center;padding:18px 24px;
+  background:var(--blue-wash);border-bottom:1px solid var(--hair)}
+.pb-photo{width:84px;height:104px;object-fit:cover;border-radius:8px;flex:none;
+  border:3px solid #fff;box-shadow:0 3px 10px -3px rgba(11,26,59,.45)}
+.pb-photo-ph{display:grid;place-items:center;background:#fff;color:var(--blue-ink);
+  font-weight:800;font-size:28px}
+.pb-name{font-size:21px;font-weight:800;line-height:1.2;color:var(--blue-ink)}
+.pb-acno{display:inline-block;font-size:12.5px;font-weight:800;margin-top:5px;
+  font-variant-numeric:tabular-nums;letter-spacing:.06em;
+  background:#fff;border:1px solid var(--hair);border-radius:6px;padding:2px 8px}
+.pb-status{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+.pb-pill{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+  padding:3px 9px;border-radius:999px;background:#eef1f5;color:var(--muted)}
+.pb-pill.on{background:var(--blue-wash);color:var(--blue-ink)}
+.pb-pill.ok{background:var(--green-wash);color:var(--green)}
+
+.pb-sect{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--blue);margin:18px 0 9px;display:flex;align-items:center;gap:9px}
+.pb-sect::after{content:"";flex:1;height:1px;background:var(--hair)}
+.pbook .pb-signs{margin-bottom:26px}
+.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 20px}
+.pb-row{display:flex;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dotted var(--hair)}
+.pb-k{color:var(--muted);flex:0 0 44%}
+.pb-v{font-weight:600;flex:1;word-break:break-word}
+.pb-scheme{font-size:14px;font-weight:700;background:var(--gold-wash);color:var(--gold-ink);
+  border-radius:8px;padding:9px 12px}
+
+/* the ledger scrolls inside itself; the page never scrolls sideways */
+.pb-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pb-table{width:100%;min-width:420px;border-collapse:collapse;font-size:12.5px;margin-top:2px}
+.pb-table th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);border-bottom:1.5px solid var(--ink);padding:7px 8px}
+.pb-table td{padding:7px 8px;border-bottom:1px solid var(--hair)}
+.pb-table tfoot td{border-top:1.5px solid var(--ink);border-bottom:0;font-weight:800}
+.pb-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pb-date{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pb-unpaid td{color:var(--muted);background:#fbfbfa}
+.pb-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.pb-empty{font-size:13px;color:var(--muted);padding:18px 0;text-align:center}
+
+.pb-signs{display:flex;gap:40px;margin-top:34px;font-size:11px;color:var(--muted)}
+.pb-signs>div{flex:1;text-align:center}
+.pb-signline{border-top:1px solid var(--ink);margin-bottom:5px}
+
+@media (max-width:560px){
+  .pb-grid{grid-template-columns:1fr}
+  .pbook>*:not(.pb-head):not(.pb-member){margin-left:15px;margin-right:15px}
+  .pb-head,.pb-member{padding-left:15px;padding-right:15px}
+  .pb-society{font-size:17px}
+  .pb-logo{width:52px;height:52px}
+  .pb-photo{width:70px;height:88px}
+  .pb-name{font-size:18px}
+  .pb-signs{gap:20px}
+}
+
+/* one clean sheet, none of the app chrome */
+@media print{
+  body *{visibility:hidden}
+  #passbook, #passbook *{visibility:visible}
+  #passbook{position:static;display:block;overflow:visible;background:#fff}
+  #passbook .pb-chrome, #passbook .dback, #passbook .tb-btn{display:none!important}
+  #passbook .content{padding:0}
+  .pbook{border:0;box-shadow:none;border-radius:0;max-width:none;padding:0}
+  .pb-table{font-size:11px}
+  @page{margin:14mm}
+}
+
+/* =====================================================================
+   MOTION + POLISH
+   One layer on top of everything above. House rules:
+   - only transform and opacity move, so a cheap phone stays smooth;
+   - entrances fill "backwards" only: once finished, the element is back
+     under its ordinary rules, so press and hover states still work;
+   - all of it stops for anyone who asks their device for less motion.
+   ===================================================================== */
+button,input,textarea,select{font-family:inherit}
+button{touch-action:manipulation}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes fadein{from{opacity:0}}
+@keyframes fadeout{to{opacity:0}}
+@keyframes slidein{from{opacity:0;transform:translateX(28px)}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}}
+@keyframes zoomin{from{opacity:0;transform:scale(.92)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- touch feedback ---------- */
+.btn-primary,.btn-gold,.btn-ghost,.btn-danger,.actionbtn,.photo-btn,.checkbtn,.chip,.slot,.tb-btn,.dback,.langpill,.tick,.fab,
+.linkbtn,.card,.stat,.finput,.searchbar,.amt-input{
+  transition:transform .18s var(--ease),box-shadow .25s var(--ease),background-color .2s,border-color .2s,color .2s,opacity .2s,filter .2s}
+.btn-primary:active:not(:disabled),.btn-gold:active,.btn-ghost:active:not(:disabled),.btn-danger:active:not(:disabled),
+.actionbtn:active,.photo-btn:active:not(:disabled),.checkbtn:active,.chip:active:not(:disabled),.slot:active,
+.tb-btn:active,.dback:active,.langpill:active,.tick:active:not(:disabled){transform:scale(.96)}
+.card[data-acc]:active,.card[style*="cursor:pointer"]:active,.vcard:active{transform:scale(.985)}
+.btn-primary{box-shadow:0 12px 22px -14px rgba(11,59,143,.95)}
+.chip.on{box-shadow:0 8px 16px -10px rgba(22,86,201,.95)}
+.mav{background:linear-gradient(135deg,var(--mav1),var(--mav2))}
+.finput[readonly]{background:var(--ro);color:var(--muted)}
+
+@media (hover:hover){
+  .card[data-acc]:hover,.card[style*="cursor:pointer"]:hover{transform:translateY(-2px);
+    box-shadow:0 2px 4px rgba(11,26,59,.06),0 18px 30px -18px rgba(11,26,59,.5)}
+  .btn-primary:hover:not(:disabled),.btn-gold:hover,.fab:hover{filter:brightness(1.08)}
+  .actionbtn:hover,.chip:hover:not(.on):not(:disabled){border-color:var(--blue);background:var(--blue-wash);color:var(--blue-ink)}
+  .photo-btn:hover:not(:disabled){background:var(--photo-hover)}
+  .btn-ghost:hover:not(:disabled){background:var(--ghost-hover)}
+  .tb-btn:hover,.dback:hover,.langpill:hover{background:rgba(255,255,255,.28)}
+  .bottomnav button:hover{color:var(--blue-ink)}
+}
+
+/* keyboard users at a desk can see where they are */
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.finput:focus-visible,.searchbar:focus-visible,.amt-input:focus-visible,.fieldwrap input:focus-visible{outline:none}
+#screen-login :focus-visible,.topbar :focus-visible,.dhead :focus-visible{outline-color:#fff}
+
+/* press ripple (the <i> is added by app.js) */
+.rip{overflow:hidden}
+.rip:not(.fab){position:relative}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.2;transform:scale(0);pointer-events:none;
+  animation:ripple .6s ease-out forwards}
+@keyframes ripple{to{transform:scale(1);opacity:0}}
+
+/* ---------- things arrive, they do not just appear ---------- */
+#app-root{animation:fadein .35s ease backwards}
+/* Only the first screenful moves. A list can hold hundreds of rows, and
+   animating what is below the fold costs a cheap phone for nothing. */
+#content>*:nth-child(-n+16):not(.fab),.detail.open>.content>*:nth-child(-n+16),.card:nth-child(-n+12),.grid2>*,.checkbtn{animation:rise .44s var(--ease) backwards}
+#content>*:nth-child(2),.detail.open>.content>*:nth-child(2),.card:nth-child(2),.grid2>*:nth-child(2){animation-delay:.04s}
+#content>*:nth-child(3),.detail.open>.content>*:nth-child(3),.card:nth-child(3),.grid2>*:nth-child(3){animation-delay:.08s}
+#content>*:nth-child(4),.detail.open>.content>*:nth-child(4),.card:nth-child(4),.grid2>*:nth-child(4){animation-delay:.12s}
+#content>*:nth-child(5),.detail.open>.content>*:nth-child(5),.card:nth-child(5){animation-delay:.16s}
+#content>*:nth-child(6),.detail.open>.content>*:nth-child(6),.card:nth-child(6){animation-delay:.2s}
+#content>*:nth-child(7),.detail.open>.content>*:nth-child(7),.card:nth-child(7){animation-delay:.24s}
+#content>*:nth-child(8),.detail.open>.content>*:nth-child(8),.card:nth-child(8){animation-delay:.27s}
+#content>*:nth-child(n+9),.detail.open>.content>*:nth-child(n+9),.card:nth-child(n+9){animation-delay:.3s}
+/* lists that redraw on every keystroke only fade, or typing would feel jumpy */
+#mlist .card,#clist .card{animation:none}
+#mlist .card:nth-child(-n+14),#clist .card:nth-child(-n+14){animation:fadein .22s ease backwards;animation-delay:0s}
+.empty{animation:fadein .4s ease backwards}
+.memberphoto,.thumb,.photo-prev img,.pb-photo{animation:fadein .45s ease backwards}
+.slot.paid{animation:pop .45s var(--spring) backwards}
+.fab{animation:fabin .5s var(--spring) .3s backwards}
+@keyframes fabin{from{opacity:0;transform:scale(.3) rotate(-90deg)}}
+.checkbtn-n{animation:nudge 2.6s ease-in-out 1.2s infinite}
+@keyframes nudge{0%,70%,100%{transform:scale(1)}80%{transform:scale(1.2)}90%{transform:scale(.95)}}
+
+/* full-screen pages slide in; sheets rise; pictures zoom */
+.detail.open{animation:slidein .34s var(--ease) backwards}
+.sheet-back.open{animation:fadein .22s ease backwards}
+.sheet{animation:up .34s var(--ease)}
+.lightbox.open{animation:fadein .2s ease backwards}
+.lightbox.open img{animation:zoomin .3s var(--ease) backwards}
+.toast{border-radius:14px;font-weight:600;box-shadow:0 14px 30px -12px rgba(11,26,59,.6);
+  transform:translateX(-50%) translateY(18px) scale(.94);transition:opacity .22s ease,transform .38s var(--spring)}
+.toast.show{transform:translateX(-50%) translateY(0) scale(1)}
+
+/* ---------- waiting ---------- */
+.skel{display:grid;gap:10px;padding-top:2px}
+.skel i{display:block;height:62px;border-radius:16px;background:var(--skel);position:relative;overflow:hidden}
+.skel i:nth-child(2){opacity:.7}
+.skel i:nth-child(3){opacity:.45}
+.skel i::after{content:"";position:absolute;top:0;bottom:0;left:0;right:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,rgba(255,255,255,0),var(--skel-shine),rgba(255,255,255,0));
+  animation:sweep 1.25s ease-in-out infinite}
+@keyframes sweep{to{transform:translateX(100%)}}
+
+/* the thin bar across the very top while anything is being fetched */
+#netbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:90;pointer-events:none;overflow:hidden;
+  opacity:0;transition:opacity .3s ease .12s}
+#netbar.on{opacity:1;transition:opacity .1s}
+#netbar::before{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;border-radius:3px;transform:translateX(-110%);
+  background:linear-gradient(90deg,rgba(246,182,12,0),var(--gold),#fff,var(--pink),rgba(224,21,134,0))}
+#netbar.on::before{animation:netrun 1.05s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes netrun{to{transform:translateX(330%)}}
+
+.updpill{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:95;border:0;cursor:pointer;
+  background:var(--toast);color:#fff;font-weight:700;font-size:13px;padding:10px 16px;border-radius:999px;white-space:nowrap;
+  box-shadow:0 14px 30px -12px rgba(11,26,59,.7);animation:dropin .45s var(--spring) backwards}
+@keyframes dropin{from{opacity:0;transform:translateX(-50%) translateY(-24px)}}
+
+/* ---------- sign-in: slow colour drift, the seal arrives, then the card ---------- */
+#screen-login{overflow:hidden;isolation:isolate}
+#screen-login::before,#screen-login::after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
+#screen-login::before{width:130vmax;height:130vmax;left:-72vmax;top:-78vmax;
+  background:radial-gradient(closest-side,rgba(224,21,134,.5),rgba(224,21,134,0));
+  animation:drift1 15s ease-in-out infinite alternate}
+#screen-login::after{width:120vmax;height:120vmax;right:-70vmax;bottom:-74vmax;
+  background:radial-gradient(closest-side,rgba(246,182,12,.4),rgba(246,182,12,0));
+  animation:drift2 18s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(26vmax,18vmax) scale(1.12)}}
+@keyframes drift2{to{transform:translate(-22vmax,-16vmax) scale(1.15)}}
+
+#emblem-slot{position:relative;display:grid;place-items:center;width:128px;height:128px;
+  animation:logoin .95s var(--spring) backwards}
+#emblem-slot .emblem{position:relative;z-index:1}
+/* a gold light circling the seal */
+#emblem-slot::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,#FFE08A 70deg,#fff 100deg,rgba(255,255,255,0) 150deg,
+    rgba(255,255,255,0) 200deg,#F6B60C 260deg,#FF8CC8 310deg,rgba(255,255,255,0) 360deg);
+  -webkit-mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));
+          mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));
+  animation:spin 4.5s linear infinite}
+#emblem-slot::after{content:"";position:absolute;top:10px;right:10px;bottom:10px;left:10px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.55);opacity:0;animation:ping 3s ease-out 1.1s infinite}
+@keyframes logoin{from{opacity:0;transform:scale(.5) rotate(-30deg)}}
+@keyframes ping{0%{transform:scale(.95);opacity:.7}70%,100%{transform:scale(1.45);opacity:0}}
+
+.brand-name{animation:rise .6s var(--ease) .3s backwards}
+.brand-sub{animation:rise .6s var(--ease) .38s backwards}
+.glass{animation:rise .65s var(--ease) .08s backwards}
+.lang-toggle{animation:rise .6s var(--ease) .18s backwards}
+.glass.shake{animation:shake .42s ease}
+@keyframes shake{20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+/* Booting: only the seal and three dots until app.js knows whether someone
+   is signed in. If the script never runs, the card shows itself after 9s. */
+#screen-login.booting .glass,#screen-login.booting .lang-toggle{opacity:0;visibility:hidden;animation:reveal .5s ease 9s forwards}
+@keyframes reveal{to{opacity:1;visibility:visible}}
+.bootdots{position:absolute;left:0;right:0;top:calc(50% + 44px);display:none;justify-content:center;gap:8px}
+#screen-login.booting .bootdots{display:flex;animation:fadeout .3s ease 9s forwards}
+.bootdots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.92);animation:dot 1s ease-in-out infinite}
+.bootdots i:nth-child(2){animation-delay:.15s}
+.bootdots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:scale(.55);opacity:.45}40%{transform:scale(1);opacity:1}}
+
+.fieldwrap{transition:box-shadow .2s,transform .2s var(--ease)}
+.fieldwrap:focus-within{box-shadow:0 0 0 3px rgba(246,182,12,.8);transform:translateY(-1px)}
+.lang-toggle button{transition:background-color .2s,color .2s,transform .18s var(--ease)}
+.lang-toggle button:active{transform:scale(.95)}
+.btn-gold{position:relative;overflow:hidden}
+.btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;transform:translateX(-140%) skewX(-20deg);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.55),rgba(255,255,255,0));
+  animation:sheen 4.2s ease-in-out 1.6s infinite}
+@keyframes sheen{0%{transform:translateX(-140%) skewX(-20deg)}22%,100%{transform:translateX(340%) skewX(-20deg)}}
+.btn-gold.busy{color:transparent;pointer-events:none}
+.btn-gold.busy::before{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;
+  border:3px solid rgba(58,42,0,.25);border-top-color:#3a2a00;animation:spin .7s linear infinite}
+
+/* ---------- shell ----------
+   flex:none matters: both bars are children of a column flexbox, and a
+   clipped flex child is otherwise allowed to be squashed to nothing. */
+.topbar,.dhead{overflow:hidden;flex:none}
+.tb-right{flex:none}
+.topbar::before,.dhead::before{content:"";position:absolute;right:-50px;top:-90px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,255,255,.2),rgba(255,255,255,0));pointer-events:none}
+.topbar::after,.dhead::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,rgba(246,182,12,0),var(--gold) 30%,var(--pink) 70%,rgba(224,21,134,0))}
+.topbar>*,.dhead>*{position:relative}
+
+/* attendance: the strip under the top bar. Gold until you check in, then a
+   slim green line with the time. */
+#attstrip{flex:none}
+#attstrip:empty{display:none}
+.att{display:flex;align-items:center;gap:9px;font-weight:700;animation:rise .4s var(--ease) backwards}
+.att svg{width:18px;height:18px;flex:none}
+.att-t{flex:1;min-width:0}
+.att-no{background:var(--gold-wash);color:var(--gold-ink);border-bottom:1px solid var(--gold-line);font-size:13px;padding:9px 12px 9px 16px}
+.att-in,.att-done{background:var(--green-wash);color:var(--green);border-bottom:1px solid var(--green-line);font-size:12.5px;padding:6px 12px 6px 16px}
+.att-done{padding-top:8px;padding-bottom:8px}
+.att-btn,.att-link{cursor:pointer;font-weight:800;border-radius:999px;white-space:nowrap;
+  transition:transform .18s var(--ease),opacity .2s,filter .2s}
+.att-btn{border:0;background:linear-gradient(135deg,#FFCE45,var(--gold-deep));color:#3a2a00;font-size:13px;padding:9px 16px;
+  box-shadow:0 8px 16px -10px rgba(196,136,10,.95);animation:nudge 2.6s ease-in-out 1.6s infinite}
+.att-link{border:1px solid var(--green-line);background:var(--card);color:var(--green);font-size:12px;padding:6px 12px}
+.att-btn:active,.att-link:active{transform:scale(.96)}
+.att-btn:disabled,.att-link:disabled{opacity:.5;animation:none}
+@media (min-width:900px){ .att{justify-content:center} .att-t{flex:none} }
+
+/* check-in sheet: where you are */
+.ci-place{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 12px;border-radius:12px;
+  font-size:13px;font-weight:700;background:var(--soft);color:var(--muted)}
+.ci-place svg{width:18px;height:18px;flex:none}
+.ci-place span{flex:1}
+.ci-place.ok{background:var(--green-wash);color:var(--green)}
+.ci-place.no{background:var(--gold-wash);color:var(--gold-ink)}
+.ci-place.wait svg{animation:dot 1s ease-in-out infinite}
+/* the register: selfie, map, what is missing, and Fix */
+.att-selfie{width:40px;height:40px;border-radius:12px;object-fit:cover;flex:none;cursor:pointer;
+  border:1px solid var(--hair);animation:fadein .45s ease backwards}
+.att-extra{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-top:9px;padding-top:8px;
+  border-top:1px dashed var(--hair);font-size:12.5px}
+.att-extra .sp{flex:1}
+a.linkbtn{text-decoration:none}
+
+/* the dashboard's tappable cards read like the stat cards beside them */
+.card .slabel{font-size:11.5px;color:var(--muted);font-weight:600}
+.card .sval{font-size:20px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+
+.hello{margin:2px 2px 12px}
+.hello-hi{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.hello-date{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+.tile{position:relative;overflow:hidden;isolation:isolate}
+.tile::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:-1;
+  background:radial-gradient(circle at 92% -10%,rgba(255,255,255,.26) 0,rgba(255,255,255,.26) 90px,rgba(255,255,255,0) 91px),
+             radial-gradient(circle at 68% 135%,rgba(255,255,255,.14) 0,rgba(255,255,255,.14) 80px,rgba(255,255,255,0) 81px)}
+.tile::after{content:"";position:absolute;top:0;bottom:0;left:0;width:38%;z-index:-1;transform:translateX(-140%) skewX(-18deg);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.38),rgba(255,255,255,0));
+  animation:sheenonce 1.2s ease-out .55s 1 backwards}
+@keyframes sheenonce{to{transform:translateX(420%) skewX(-18deg)}}
+.tile.hero{padding:18px 18px 20px}
+.tile.hero .tval{font-size:34px;letter-spacing:-.01em}
+
+.searchbar{padding-left:44px;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236A7A97' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") 14px 50%/19px no-repeat}
+.searchbar:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-wash),var(--shadow)}
+
+/* bottom navigation: the chosen tab sits on a soft pill */
+.bottomnav{border-top-color:transparent;box-shadow:0 -12px 28px -20px rgba(11,26,59,.45)}
+.bottomnav button{position:relative;padding:5px 0 1px;gap:4px}
+.bottomnav button::before{content:"";position:absolute;top:1px;left:50%;width:56px;height:30px;margin-left:-28px;border-radius:999px;
+  background:var(--blue-wash);opacity:0;transform:scaleX(.4);transition:transform .32s var(--spring),opacity .2s}
+.bottomnav button.on::before{opacity:1;transform:none}
+.bottomnav button svg{position:relative;transition:transform .32s var(--spring)}
+.bottomnav button span{position:relative}
+.bottomnav button.on{color:var(--blue-ink)}
+.bottomnav button.on svg{transform:translateY(-1px) scale(1.08)}
+.bottomnav button.on span{font-weight:800}
+
+/* a desk screen gets a side rail instead of a bottom bar */
+@media (min-width:900px){
+  #app-root{padding-bottom:0;padding-left:var(--rail)}
+  .bottomnav{top:0;right:auto;width:var(--rail);flex-direction:column;justify-content:flex-start;gap:8px;
+    padding:16px 8px;border-top:0;border-right:1px solid var(--hair);box-shadow:10px 0 30px -24px rgba(11,26,59,.5)}
+  .bottomnav button{flex:none;padding:7px 0 6px}
+  .bottomnav button::before{top:3px}
+  .toast{bottom:34px}
+  .fab{bottom:30px;right:30px}
+  .sheet{animation:pop .3s var(--ease)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+@media print{
+  #netbar,.updpill{display:none!important}
+  .detail,.detail *{animation:none!important}
+}
+
+/* =====================================================================
+   THE OPENING (splash.js)
+   A deep navy scene with the seal assembling in the middle of it. Three
+   levels: .sp-env behind the seal, .sp-stage (the seal itself) and
+   .sp-over in front. Everything that moves here is a transform or an
+   opacity; the particles and energy trails are drawn on two canvases.
+   The stage is a fixed square, so nothing on the page shifts and the seal
+   is never stretched.
+   ===================================================================== */
+#splash{position:fixed;top:0;right:0;bottom:0;left:0;z-index:100;display:grid;place-items:center;overflow:hidden;
+  animation:splashgone .5s ease 22s forwards}        /* script never ran: get out of the way */
+@keyframes splashgone{to{opacity:0;visibility:hidden}}
+.sp-env,.sp-over{position:absolute;top:0;right:0;bottom:0;left:0;overflow:hidden;pointer-events:none}
+.sp-env>*,.sp-over>*{position:absolute}
+.sp-bg{top:0;right:0;bottom:0;left:0;
+  background:radial-gradient(115% 80% at 50% 44%,#123A8C 0%,#0A2463 34%,#06163A 68%,#030B22 100%)}
+/* slow coloured haze, far away: blue, a little magenta, a little gold */
+.sp-neb{top:0;right:0;bottom:0;left:0}
+.sp-neb i{position:absolute;border-radius:50%}
+.sp-neb i:nth-child(1){width:120vmax;height:120vmax;left:-62vmax;top:-70vmax;
+  background:radial-gradient(closest-side,rgba(46,116,232,.5),rgba(46,116,232,0));animation:spdrift1 13s ease-in-out infinite alternate}
+.sp-neb i:nth-child(2){width:110vmax;height:110vmax;right:-64vmax;bottom:-66vmax;
+  background:radial-gradient(closest-side,rgba(224,21,134,.26),rgba(224,21,134,0));animation:spdrift2 16s ease-in-out infinite alternate}
+.sp-neb i:nth-child(3){width:90vmax;height:90vmax;left:-30vmax;bottom:-58vmax;
+  background:radial-gradient(closest-side,rgba(246,182,12,.2),rgba(246,182,12,0));animation:spdrift3 19s ease-in-out infinite alternate}
+@keyframes spdrift1{to{transform:translate(22vmax,16vmax) scale(1.15)}}
+@keyframes spdrift2{to{transform:translate(-20vmax,-14vmax) scale(1.12)}}
+@keyframes spdrift3{to{transform:translate(18vmax,-12vmax) scale(1.2)}}
+/* the last shot's field: navy opening into royal blue */
+.sp-hero{top:0;right:0;bottom:0;left:0;opacity:0;
+  background:radial-gradient(95% 70% at 50% 46%,#2E74E8 0%,#1656C9 30%,#0B2F7E 64%,#06163A 100%)}
+.sp-fx{top:0;left:0;width:100%;height:100%}
+/* speed lines: thin streaks all pointing at the centre */
+.sp-lines{left:50%;top:50%;width:128vmax;height:128vmax;margin:-64vmax 0 0 -64vmax;border-radius:50%;opacity:0;
+  background:
+    repeating-conic-gradient(from 3deg,rgba(200,225,255,0) 0deg,rgba(200,225,255,0) 6.4deg,rgba(200,225,255,.6) 6.7deg,rgba(200,225,255,0) 7deg),
+    repeating-conic-gradient(from 40deg,rgba(120,175,255,0) 0deg,rgba(120,175,255,0) 10.2deg,rgba(150,198,255,.45) 10.7deg,rgba(120,175,255,0) 11deg),
+    repeating-conic-gradient(from 75deg,rgba(255,205,90,0) 0deg,rgba(255,205,90,0) 16.4deg,rgba(255,205,90,.55) 16.8deg,rgba(255,205,90,0) 17deg);
+  -webkit-mask:radial-gradient(closest-side,rgba(0,0,0,0) 20%,rgba(0,0,0,.85) 46%,#000 70%,rgba(0,0,0,0) 100%);
+          mask:radial-gradient(closest-side,rgba(0,0,0,0) 20%,rgba(0,0,0,.85) 46%,#000 70%,rgba(0,0,0,0) 100%)}
+#splash.sp-full .sp-lines{animation:splines 1.25s ease-out .75s}
+@keyframes splines{0%{opacity:0;transform:scale(1.5)}35%{opacity:.8}100%{opacity:0;transform:scale(.98)}}
+/* scene 1: one pass of blue-and-gold light */
+.sp-sweep{top:-20%;bottom:-20%;left:0;width:70%;opacity:0;transform:translateX(-140%) skewX(-14deg);
+  background:linear-gradient(100deg,rgba(46,116,232,0) 0%,rgba(70,150,255,.5) 34%,rgba(255,255,255,.85) 50%,rgba(255,200,70,.55) 62%,rgba(246,182,12,0) 100%)}
+#splash.sp-full .sp-sweep{animation:spsweep 1.05s cubic-bezier(.45,0,.2,1) .9s}
+@keyframes spsweep{0%{opacity:1;transform:translateX(-140%) skewX(-14deg)}100%{opacity:1;transform:translateX(250%) skewX(-14deg)}}
+.sp-vig{top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 50% 46%,rgba(2,8,26,0) 42%,rgba(2,8,26,.55) 100%)}
+
+.sp-stage{position:relative;width:min(60vw,34vh,300px);height:min(60vw,34vh,300px)}
+.sp-seal{position:absolute;top:0;right:0;bottom:0;left:0;transform-origin:50% 50%}
+.sp-seal>*{position:absolute}
+/* the light the finished disc gives off into the dark */
+.sp-aura{top:0;right:0;bottom:0;left:0;border-radius:50%;opacity:0;
+  box-shadow:0 0 30px 4px rgba(160,200,255,.65),0 0 100px 24px rgba(46,116,232,.55),0 0 210px 70px rgba(46,116,232,.25)}
+.sp-bloom{top:-70%;right:-70%;bottom:-70%;left:-70%;border-radius:50%;opacity:0;
+  background:radial-gradient(closest-side,#fff 0%,rgba(190,225,255,.9) 22%,rgba(70,150,255,.45) 50%,rgba(46,116,232,0) 100%)}
+.sp-paper{top:0;right:0;bottom:0;left:0;border-radius:50%;background:#fff;opacity:0}
+.sp-rays{left:6%;top:6%;width:88%;height:88%;border-radius:50%;opacity:0;
+  background:repeating-conic-gradient(from 0deg,rgba(246,182,12,0) 0deg,rgba(246,182,12,0) 9deg,rgba(255,196,50,.6) 11deg,rgba(246,182,12,0) 13deg,rgba(246,182,12,0) 20deg);
+  -webkit-mask:radial-gradient(closest-side,#000 0%,#000 22%,rgba(0,0,0,.5) 48%,rgba(0,0,0,0) 78%);
+          mask:radial-gradient(closest-side,#000 0%,#000 22%,rgba(0,0,0,.5) 48%,rgba(0,0,0,0) 78%)}
+.sp-gold{left:27%;top:27%;width:46%;height:46%;border-radius:50%;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,226,140,.95),rgba(246,182,12,.5) 42%,rgba(246,182,12,0) 72%)}
+.sp-layers{top:0;right:0;bottom:0;left:0}
+.sp-layers>*{position:absolute}
+.sp-hands{top:0;right:0;bottom:0;left:0;transform-origin:50% 50%}
+.sp-final{top:0;left:0;width:100%;height:100%;border-radius:50%;opacity:0;display:block}
+.sp-ringflash{top:0;right:0;bottom:0;left:0;border-radius:50%;opacity:0;border:2px solid rgba(190,220,255,.9);
+  box-shadow:0 0 22px rgba(120,180,255,.8)}
+
+/* the point of light at the pen while the border is drawn, with a short tail */
+.sp-comet{top:0;right:0;bottom:0;left:0;opacity:0}
+.sp-comet::before{content:"";position:absolute;left:50%;top:1.5%;width:17%;height:17%;margin:-8.5% 0 0 -8.5%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,255,255,.95) 0%,rgba(150,192,255,.78) 20%,rgba(46,116,232,.26) 55%,rgba(46,116,232,0) 100%)}
+.sp-comet::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(170,205,255,0) 0deg,rgba(170,205,255,0) 300deg,rgba(190,218,255,.7) 352deg,rgba(255,255,255,.95) 359deg,rgba(255,255,255,0) 360deg);
+  -webkit-mask:radial-gradient(closest-side,rgba(0,0,0,0) 91.5%,#000 93.5%,#000 100%);
+          mask:radial-gradient(closest-side,rgba(0,0,0,0) 91.5%,#000 93.5%,#000 100%)}
+/* the light each arm trails as it flies in, and the flash where it takes hold */
+.sp-streak{position:absolute;opacity:0;transform-origin:0 50%;border-radius:50%;
+  background:linear-gradient(90deg,rgba(255,255,255,.95) 0%,rgba(90,160,255,.82) 10%,rgba(46,116,232,.36) 45%,rgba(46,116,232,0) 100%);
+  -webkit-mask:linear-gradient(180deg,rgba(0,0,0,0),#000 50%,rgba(0,0,0,0));mask:linear-gradient(180deg,rgba(0,0,0,0),#000 50%,rgba(0,0,0,0))}
+.sp-streak.gold{background:linear-gradient(90deg,rgba(255,255,255,.95) 0%,rgba(255,205,80,.88) 10%,rgba(246,182,12,.4) 45%,rgba(246,182,12,0) 100%)}
+.sp-flashdot{position:absolute;width:38%;height:38%;margin:-19% 0 0 -19%;border-radius:50%;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(90,160,255,.7) 30%,rgba(46,116,232,0) 100%)}
+.sp-flashdot.gold{background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(255,205,80,.8) 30%,rgba(246,182,12,0) 100%)}
+/* the reflection that passes over the emblem; cut to the emblem's own shape */
+.sp-shine{overflow:hidden;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.sp-shine i{position:absolute;top:-10%;bottom:-10%;left:0;width:45%;transform:translateX(-130%) skewX(-18deg);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,248,220,.92),rgba(255,255,255,0))}
+
+/* While the opening plays, the screen behind waits with its own entrance,
+   and the logo it shows stays hidden: the seal from the opening lands on
+   that exact spot and becomes it. */
+html.splashing #emblem-slot{animation:none;opacity:0}
+html.splashing .tb-emblem{opacity:0}
+html.splashing .brand-name,html.splashing .brand-sub,html.splashing .glass,html.splashing .lang-toggle,
+html.splashing #app-root{animation-play-state:paused}
+html.splashed #emblem-slot,html.splashed .tb-emblem{animation:fadein .25s ease backwards}
+@media print{ #splash{display:none!important} }
+
+/* =====================================================================
+   SECOND PASS ON THE SCREENS
+   Member page header, grouped forms with a save button that stays in
+   reach, progress bars, the passbook's finish, small dark-mode repairs,
+   and a real layout for a computer screen.
+   ===================================================================== */
+button{color:inherit}
+.amt-input{background:var(--card);color:var(--ink)}
+.searchbar{color:var(--ink)}
+/* top bar: a long name never pushes the buttons off a narrow phone */
+.tb-left>div{min-width:0}
+.tb-title,.tb-sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-right{gap:6px}
+
+/* ---------- the top of a member's page ---------- */
+.mhero{position:relative;overflow:hidden;isolation:isolate;text-align:center;border-radius:20px;padding:22px 16px 18px;
+  margin-bottom:12px;color:#fff;box-shadow:var(--shadow-lg);
+  background:linear-gradient(135deg,var(--blue-2),var(--blue) 55%,var(--blue-deep))}
+.mhero::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:-1;
+  background:radial-gradient(circle at 90% -10%,rgba(255,255,255,.22) 0,rgba(255,255,255,.22) 110px,rgba(255,255,255,0) 111px),
+             radial-gradient(circle at 6% 120%,rgba(255,255,255,.12) 0,rgba(255,255,255,.12) 100px,rgba(255,255,255,0) 101px)}
+.hero-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;display:inline-grid;place-items:center;cursor:pointer;
+  border:3px solid rgba(255,255,255,.92);box-shadow:0 12px 24px -10px rgba(0,0,0,.55);background:rgba(255,255,255,.16);
+  font-size:34px;font-weight:800;letter-spacing:.5px;animation:pop .5s var(--spring) backwards}
+.hero-photo.ph{cursor:default}
+/* at the counter the picture is large: it is how the cashier knows the person */
+.hero-photo.big{width:min(62vw,220px);height:min(62vw,220px);border-radius:26px;font-size:64px}
+.hero-name{font-size:19px;font-weight:800;margin-top:12px;line-height:1.2;letter-spacing:-.01em}
+.hero-acno{display:inline-block;margin-top:7px;font-size:12.5px;font-weight:800;letter-spacing:.07em;
+  font-variant-numeric:tabular-nums;background:rgba(255,255,255,.18);padding:4px 11px;border-radius:999px}
+.hero-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.hero-pill{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16)}
+.hero-pill.ok{background:rgba(74,222,128,.28)}
+.hero-pill.off{background:rgba(0,0,0,.28)}
+
+.btnrow{flex-wrap:wrap}
+.btnrow .actionbtn{flex:1 1 130px}
+.actionbtn.cta{color:#fff;border-color:transparent;padding:13px;
+  background:linear-gradient(135deg,var(--blue-2),var(--blue-deep));box-shadow:0 12px 22px -14px rgba(11,59,143,.95)}
+.kv a.linkbtn{padding:0;text-decoration:none}
+
+/* ---------- forms: fields in cards, Save always within reach ---------- */
+.fcard{padding:6px 13px 14px}
+.fcard>.flabel:first-child{margin-top:8px}
+.detail>.content>.btn-primary{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom));z-index:3;
+  box-shadow:0 0 0 10px var(--screen),0 -22px 18px 4px var(--screen)}
+/* a refusal is shown just above the button, wherever the form is scrolled to */
+.detail>.content>.fmsg.err{position:sticky;bottom:calc(78px + env(safe-area-inset-bottom));z-index:3;
+  background:var(--red-wash);border-radius:10px;padding:9px 11px;box-shadow:0 0 0 6px var(--screen)}
+
+/* ---------- progress ---------- */
+.tbar{height:6px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;margin-top:10px}
+.tbar span{display:block;height:100%;width:0;border-radius:99px;background:#fff;transition:width .6s var(--ease)}
+.bar{height:6px;border-radius:99px;background:var(--hair);overflow:hidden;margin-top:9px}
+.bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-2),var(--blue));
+  animation:grow .7s var(--ease) backwards}
+.bar.full span{background:var(--green)}
+@keyframes grow{from{width:0}}
+.tile.mini{padding:12px 15px;margin-bottom:12px}
+.tile.mini .tval{font-size:22px}
+
+/* ---------- passbook ---------- */
+.pbook{position:relative}
+.pb-water{position:absolute;left:50%;top:58%;width:46%;max-width:340px;margin:0!important;border-radius:50%;
+  transform:translate(-50%,-50%);opacity:.05;pointer-events:none}
+.pb-table tbody tr:nth-child(even) td{background:#FAFBFE}
+.pb-table.pb-hold{min-width:0}
+.pb-hold td{vertical-align:middle}
+.pb-foot{font-size:10px;color:var(--muted);text-align:center;border-top:1px solid var(--hair);padding:9px 0 12px;margin-top:-10px}
+
+/* dashboard halves: cards inside them arrive one after another too */
+.dash-a>*,.dash-b>*{animation:rise .44s var(--ease) backwards}
+.dash-a>*:nth-child(2),.dash-b>*:nth-child(2){animation-delay:.05s}
+.dash-a>*:nth-child(3),.dash-b>*:nth-child(3){animation-delay:.1s}
+.dash-a>*:nth-child(4),.dash-b>*:nth-child(4){animation-delay:.15s}
+.dash-a>*:nth-child(n+5){animation-delay:.2s}
+
+/* ---------- a computer screen ----------
+   From 1100px: a page that used to cover everything opens as a panel on
+   the right, and the screen behind it moves over and stays usable - pick
+   another member in the list and the panel simply changes. The dashboard
+   sets its two halves side by side. The passbook and the forced
+   change-password screen still take the whole window. */
+@media (min-width:1100px){
+  :root{--drawer:min(720px,46vw)}
+  .detail:not(#passbook):not(#pwscreen){left:auto;width:var(--drawer);border-left:1px solid var(--hair);
+    box-shadow:-30px 0 60px -40px rgba(11,26,59,.6)}
+  #app-root{transition:margin-right .3s var(--ease)}
+  body:has(.detail.open:not(#passbook):not(#pwscreen)) #app-root{margin-right:var(--drawer)}
+  body:has(.detail.open:not(#passbook):not(#pwscreen)) .fab{right:calc(var(--drawer) + 30px)}
+  #content[data-tab="home"]{max-width:1180px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+    column-gap:20px;align-items:start}
+  #content[data-tab="home"]>.hello{grid-column:1 / -1}
+  .dash-b>.sectlabel:first-child{margin-top:2px}
+  body:has(.detail.open:not(#passbook):not(#pwscreen)) #content[data-tab="home"]{display:block;max-width:820px}
+}
+
+/* =====================================================================
+   SMOOTH PASS
+   Things now leave the way they came: a page slides back out, a sheet
+   drops, a photo shrinks away. Before this they vanished in one frame.
+   Phones without @starting-style (old ones) simply close at once, as before.
+   Swipes (app.js): drag a sheet down to close it; drag a page from the
+   left edge to go back.
+   ===================================================================== */
+:root{--out:cubic-bezier(.32,.72,0,1)}           /* the curve phones use for sheets */
+
+.detail{opacity:0;transform:translateX(36px);overscroll-behavior:contain;
+  transition:opacity .24s ease,transform .32s var(--out),display .32s allow-discrete,overlay .32s allow-discrete}
+.detail.open{opacity:1;transform:none;animation:none}
+@starting-style{.detail.open{opacity:0;transform:translateX(36px)}}
+
+.sheet-back{background:rgba(16,25,46,0);transition:background-color .28s ease,display .34s allow-discrete}
+.sheet-back.open{background:rgba(16,25,46,.5);animation:none}
+@starting-style{.sheet-back.open{background:rgba(16,25,46,0)}}
+.sheet{animation:none;transform:translateY(105%);transition:transform .34s var(--out);overscroll-behavior:contain;touch-action:pan-y}
+.sheet-back.open .sheet{transform:none}
+@starting-style{.sheet-back.open .sheet{transform:translateY(105%)}}
+
+.lightbox{opacity:0;transition:opacity .22s ease,display .26s allow-discrete}
+.lightbox.open{opacity:1;animation:none}
+@starting-style{.lightbox.open{opacity:0}}
+.lightbox img{transform:scale(.9);transition:transform .3s var(--out)}
+.lightbox.open img{transform:none;animation:none}
+@starting-style{.lightbox.open img{transform:scale(.9)}}
+
+/* while a finger is dragging, the element follows it exactly */
+.dragging,.dragging .sheet{transition:none!important}
+
+/* bottom nav: a soft pill slides under the chosen tab */
+.bottomnav button{position:relative;transition:color .2s}
+.bottomnav button::before{content:"";position:absolute;top:-2px;left:50%;width:58px;height:30px;margin-left:-29px;
+  border-radius:999px;background:var(--blue-wash);opacity:0;transform:scaleX(.4);
+  transition:opacity .2s ease,transform .38s var(--spring);z-index:-1}
+.bottomnav button.on::before{opacity:1;transform:none}
+.bottomnav button svg{transition:transform .38s var(--spring)}
+.bottomnav button.on svg{transform:translateY(-1px) scale(1.06)}
+.bottomnav button:active svg{transform:scale(.88)}
+.bottomnav{isolation:isolate}
+
+/* switching tabs: the old screen slips away toward where it came from */
+#content{view-transition-name:content}
+::view-transition-old(root),::view-transition-new(root){animation:none}
+::view-transition-new(content){animation:none}
+::view-transition-old(content){animation:vtout .2s ease forwards}
+html.vt-back::view-transition-old(content){animation-name:vtoutr}
+@keyframes vtout{to{opacity:0;transform:translateX(-24px)}}
+@keyframes vtoutr{to{opacity:0;transform:translateX(24px)}}
+/* the theme switch spreads out from its button instead */
+html.vt-theme #content{view-transition-name:none}
+
+.finput,.searchbar,.amt-input{transition:transform .18s var(--ease),box-shadow .22s ease,border-color .2s,background-color .2s}
+html{scroll-padding-top:80px}
+
+/* ---------- COLLECTION tab ---------- */
+.co-seg{position:relative;display:flex;background:var(--soft);border-radius:14px;padding:4px;margin:12px 0 8px;isolation:isolate}
+.co-seg button{flex:1;border:0;background:none;padding:10px 6px;font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer;
+  border-radius:11px;transition:color .2s;font-family:inherit}
+.co-seg button b{font-weight:700;opacity:.75;margin-left:3px}
+.co-seg button.on{color:var(--blue-ink)}
+.co-seg>i{position:absolute;z-index:-1;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:11px;background:var(--card);
+  box-shadow:0 4px 12px -6px rgba(11,26,59,.45);transition:transform .38s var(--spring)}
+.co-seg[data-v="groups"]>i{transform:translateX(100%)}
+.co-only{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin:4px 2px 10px;cursor:pointer}
+.co-only input{width:18px;height:18px;accent-color:var(--blue)}
+.co-pill{flex:none;font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.co-pill.given{background:var(--green-wash);color:var(--green)}
+.co-pill.not{background:var(--pink-wash);color:var(--pink-ink)}
+.co-pill.wait{background:var(--gold-wash);color:var(--gold-ink)}
+.co-row.wait{border-left:3px solid var(--gold)}
+.co-row.not{border-left:3px solid var(--pink)}
+.co-group{padding-bottom:12px}
+.co-ghead{cursor:pointer}
+.co-ghead .bar{margin-top:7px}
+.co-chev{font-size:22px;color:var(--muted);margin-left:4px;transition:transform .3s var(--spring)}
+.co-group.open .co-chev{transform:rotate(90deg)}
+.co-gbody{display:grid;gap:8px}
+.co-group.open .co-gbody{margin-top:12px}
+.co-gbody .card{margin:0;box-shadow:none;border:1px solid var(--hair);animation:fadein .25s ease backwards}
+.checkbtn.coll{background:var(--gold-wash);border-color:var(--gold-line);color:var(--gold-ink)}
+.checkbtn.coll.done{background:var(--green-wash);border-color:var(--green-line);color:var(--green)}
+.checkbtn.coll.done .checkbtn-n{background:var(--green)}
+.co-act{flex:none;width:36px;height:36px;border-radius:12px;border:1px solid var(--hair);background:var(--card);color:var(--blue-ink);
+  display:grid;place-items:center;cursor:pointer;margin-left:6px;font-size:17px;font-weight:900;transition:transform .18s var(--ease),background-color .2s}
+.co-act svg{width:18px;height:18px}
+.co-act.tick{background:var(--green-wash);border-color:var(--green-line);color:var(--green)}
+.co-act:active{transform:scale(.9)}
+@media (hover:hover){.co-act.tick:hover{background:var(--green);color:#fff}}
+#tk-by{flex-wrap:wrap}
+
+/* ---------- payment calendar on the member page ---------- */
+.mcal{margin-top:12px;padding-top:12px;border-top:1px solid var(--hair)}
+.mcal-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.mcal-t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.mcal-m{font-size:13px;font-weight:800;min-width:118px;text-align:center}
+.mcal-head .chip{padding:5px 11px;min-width:0}
+.mcal-head .chip:disabled{opacity:.35}
+.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mcal-grid b{font-size:10.5px;font-weight:800;color:var(--muted);text-align:center;padding-bottom:2px}
+.mcal-grid span{position:relative;aspect-ratio:1;border-radius:9px;display:grid;place-items:center;font-size:12px;font-weight:700;
+  color:var(--muted);background:var(--soft);cursor:default;line-height:1}
+.mcal-grid span em{position:absolute;right:2px;bottom:1px;font-style:normal;font-size:10px;font-weight:900}
+.mcal-grid span.out{background:none;opacity:.35}
+.mcal-grid span.off{background:none}
+.mcal-grid span.paid{background:var(--green-wash);color:var(--green);cursor:pointer}
+.mcal-grid span.np{background:var(--pink-wash);color:var(--pink-ink);cursor:pointer}
+.mcal-grid span.miss{background:none;color:var(--red-ink);box-shadow:inset 0 0 0 1.5px var(--red)}
+.mcal-grid span.due{background:var(--blue-wash);color:var(--blue-ink)}
+.mcal-grid span.extra{background:none;color:var(--green);cursor:pointer}
+.mcal-grid span.now{outline:2px solid var(--blue);outline-offset:1px}
+.mcal-sum{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12.5px;font-weight:800}
+.mcal-sum .paid{color:var(--green)} .mcal-sum .np{color:var(--pink-ink)} .mcal-sum .miss{color:var(--red-ink)}
+.mcal-of{margin-left:auto;color:var(--muted);font-weight:700}
+.mcal-key{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11px;font-weight:700;color:var(--muted)}
+.mcal-key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.mcal-key .paid::before{background:var(--green-wash);box-shadow:inset 0 0 0 1px var(--green)}
+.mcal-key .np::before{background:var(--pink-wash);box-shadow:inset 0 0 0 1px var(--pink)}
+.mcal-key .miss::before{box-shadow:inset 0 0 0 1.5px var(--red)}
+.mcal-key .due::before{background:var(--blue-wash)}
